@@ -53,7 +53,7 @@ func http_touch(initid *C.UDF_INIT, args *C.UDF_ARGS, isNull *C.char, isError *C
 		return 0
 	}
 
-	http.Get(a[0])
+	http.Head(a[0])
 
 	return 0
 }
