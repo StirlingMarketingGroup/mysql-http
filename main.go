@@ -20,14 +20,14 @@ func msg(message *C.char, s string) {
 //export http_touch_init
 func http_touch_init(initid *C.UDF_INIT, args *C.UDF_ARGS, message *C.char) C.bool {
 	if args.arg_count != 1 {
-		msg(message, "`http_get` requires 1 parameter: the URL string")
+		msg(message, "`http_touch` requires 1 parameter: the URL string")
 		return C.bool(true)
 	}
 
 	argsTypes := (*[2]uint32)(unsafe.Pointer(args.arg_type))
 
 	argsTypes[0] = C.STRING_RESULT
-	initid.maybe_null = 1
+	initid.maybe_null = C.bool(true)
 
 	return C.bool(false)
 }
@@ -39,7 +39,7 @@ func http_touch(initid *C.UDF_INIT, args *C.UDF_ARGS, isNull *C.char, isError *C
 	c := 1
 	argsArgs := (*[1 << 30]*C.char)(unsafe.Pointer(args.args))[:c:c]
 
-	a := make([]string, c, c)
+	a := make([]string, c)
 	for i, argsArg := range argsArgs {
 		// This should be the correct way, but lengths come through as "0"
 		// for everything after the first argument, so hopefully we don't
@@ -53,7 +53,7 @@ func http_touch(initid *C.UDF_INIT, args *C.UDF_ARGS, isNull *C.char, isError *C
 		return 0
 	}
 
-	http.Head(a[0])
+	go http.Get(a[0])
 
 	return 0
 }
